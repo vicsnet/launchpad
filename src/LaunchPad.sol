@@ -20,7 +20,12 @@ contract LaunchPad{
         mapping(address => bool) withdrawMyReward;
         string Name;
     }
+    address Owner;
     mapping(string => TokenLaunch) tokenName;
+    constructor(){
+
+        Owner = msg.sender;
+    }
 
 
     function registerLaunchPad (address _tokenContract, uint _tokenToBeSupplied, uint _startTime, uint _endTime, string memory _tokenName, uint _minimumEther, uint _amountPerMinEth) external{
@@ -97,7 +102,28 @@ require(_tokenLaunch.withdrawMyReward[msg.sender] == false, "YOU_HAVE_WITHDRAW_Y
       IERC20(_tokenLaunch.TokenContract).transfer(msg.sender, tokenToWithdraw);
 }
 
+function withdrawEther(string memory _tokenName) external{
+   _withdrawEther(_tokenName);
+}
 
+function _withdrawEther(string memory _tokenName) internal{
+    TokenLaunch storage _tokenLaunch = tokenName[_tokenName];
+    require(_tokenLaunch.TotalAmountContributed > 0, "AMOUNT_TO_WITHDRAW_IS_ZERO");
+    _tokenLaunch.TotalAmountContributed = 0;
+
+    require(msg.sender == _tokenLaunch.TokenCreator, "YOU_ARE_NOT_THE_CREATOR_OF_THIS_CONTRACT" );
+
+    address payable _owner = payable (_tokenLaunch.TokenCreator);
+
+        bool sent = _owner.send(_tokenLaunch.TotalAmountContributed );
+        require(sent, "Failed to send Ether");
+}
+
+function emergencyWithDraw(address payable _to) external{
+    require(Owner == msg.sender, "YOU_ARE_NOT_THE_CREATOR");
+      bool sent = _to.send(msg.value);
+      require(sent, "Failed to send Ether");
+}
 
 
 receive() external payable {}
