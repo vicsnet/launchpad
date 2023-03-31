@@ -6,3 +6,7 @@
 	path = lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
 	branch = v4.8.2
+[submodule "lib/dotenv"]
+	path = lib/dotenv
+	url = https://github.com/motdotla/dotenv
+	branch = v16.0.3
